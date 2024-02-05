@@ -35,7 +35,7 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
         {
             hideStack = new ItemStack(Material.getMaterial(getConfigString("gui.hideItemM",player)));
             ItemMeta meta = hideStack.getItemMeta();
-            meta.setDisplayName("");
+            meta.setDisplayName(" ");
             hideStack.setItemMeta(meta);
         }
         inv = Bukkit.createInventory(this,6*9,getConfigString("gui.title",player));
@@ -63,9 +63,12 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
 
     public void initEventHandler(){
         onClose(e->{
-            Inventory inv = e.getInventory();
+            Inventory inventory = e.getInventory();
             Player p = (Player) e.getPlayer();
-            cacheInv.put(p.getUniqueId(),inv);
+            if (this.itemStackMap.isEmpty()) {
+                return;
+            }
+            cacheInv.put(p.getUniqueId(),inventory);
             p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
         });
         onClick(e->{
