@@ -63,11 +63,11 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
 
     public void initEventHandler(){
         onClose(e->{
-            Inventory inventory = e.getInventory();
-            Player p = (Player) e.getPlayer();
-            if (this.itemStackMap.isEmpty()) {
+            if (itemStackMap.isEmpty()) {
                 return;
             }
+            Inventory inventory = e.getInventory();
+            Player p = (Player) e.getPlayer();
             cacheInv.put(p.getUniqueId(),inventory);
             p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
         });
