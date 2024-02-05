@@ -34,7 +34,7 @@ public class Main extends JavaPlugin {
         super.reloadConfig();
         help = getConfigStringList("Msg.help",null).toArray(new String[0]);
 
-        playerData = FileUtil.getInstance(new File(getDataFolder(), "playerData.yml"), false);
+        playerData = FileUtil.getInstance(new File(getDataFolder(), "playerData.yml"), true);
     }
 
     private static final List<String> subCmd = Arrays.asList(
