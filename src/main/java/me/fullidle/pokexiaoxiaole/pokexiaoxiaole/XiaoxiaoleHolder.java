@@ -75,6 +75,7 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
                 long now = System.currentTimeMillis();
                 timeCost = timeCost+(now-lastTime);
                 if (itemStackMap.values().isEmpty()){
+                    stop(player);
                     player.sendMessage("§3It takes you §a"+(double) timeCost / 1000+"§3s to complete the game");
                     saveTheFastestRecord();
                     return;
