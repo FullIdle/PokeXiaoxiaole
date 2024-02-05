@@ -1,0 +1,27 @@
+gui:
+  title: 'Poke消消乐 ———— %player_name%'
+  hideItemM: 'STAINED_GLASS_PANE'
+  pokeItemN: '{poke_name}'
+  pokeItemL:
+    - ''
+runCmd:
+  start:
+    - 'say %player_name% 开始尝试消消乐'
+  successe:
+    - 'minecraft:give %player_name% DIAMOND 1'
+    - 'say %player_name% 恭喜玩家完成消消乐获得 钻石 一个'
+  abandon:
+    - 'say %player_name% 居然放弃了这么简单的消消乐'
+Msg:
+  reload: '&a插件已重载!'
+  completeXioxiaole: '&a成功消除所有宝可梦!'
+  leaveTemporarily: '&a消消乐游戏已暂停&7(使用/pxxl begin[可恢复])'
+  stopGame: '&a成功停止游戏!'
+  resumeGame: '&a继续游戏'
+  startGame: '&a开始游戏'
+  help:
+    - 'CMD:pxxl'
+    - 'args:↓'
+    - '  stop 放弃(放弃后则没办法继续,只能重开一局{begin})'
+    - '  begin 开始一局游戏(如果上局没有结束则继续上一局)'
+    - '  reload 重载config.yml'

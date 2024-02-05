@@ -1,0 +1,8 @@
+name: ${rootProject.name}
+main: ${group}
+version: ${version}
+description: 一个小游戏
+commands:
+  pokexiaoxiaole:
+    description: 消消乐
+    aliases: [pxxl]
