@@ -2,6 +2,9 @@ name: ${rootProject.name}
 main: ${group}
 version: ${version}
 description: 一个小游戏
+depend:
+  - FICore
+  - PlaceholderAPI
 commands:
   pokexiaoxiaole:
     description: 消消乐
