@@ -1,6 +1,7 @@
 package me.fullidle.pokexiaoxiaole.pokexiaoxiaole;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.fullidle.ficore.ficore.common.api.util.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -9,6 +10,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +18,12 @@ import java.util.stream.Collectors;
 public class Main extends JavaPlugin {
     public static Main plugin;
     public static String[] help;
+    public static FileUtil playerData;
     @Override
     public void onEnable() {
         plugin = this;
         reloadConfig();
+        new MyPapi().register();
         getCommand(plugin.getDescription().getName().toLowerCase()).setExecutor(this);
         getLogger().info("§aPlugin is enabled!");
     }
@@ -29,6 +33,8 @@ public class Main extends JavaPlugin {
         saveDefaultConfig();
         super.reloadConfig();
         help = getConfigStringList("Msg.help",null).toArray(new String[0]);
+
+        playerData = FileUtil.getInstance(new File(getDataFolder(), "playerData.yml"), false);
     }
 
     private static final List<String> subCmd = Arrays.asList(

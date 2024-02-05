@@ -6,8 +6,10 @@ import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.items.ItemPixelmonSprite;
 import javafx.util.Pair;
 import me.fullidle.ficore.ficore.common.api.ineventory.ListenerInvHolder;
+import me.fullidle.ficore.ficore.common.api.util.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,6 +32,8 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
     private Pair<Integer,ItemStack> upItem;
     private final ItemStack hideStack;
     private final Player player;
+    private long lastTime = 0L;
+    private long timeCost;
 
     private XiaoxiaoleHolder(Player player){
         this.player = player;
@@ -62,14 +67,22 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
     }
 
     public void initEventHandler(){
+        onOpen(e->{
+            lastTime = System.currentTimeMillis();
+        });
         onClose(e->{
-            if (itemStackMap.isEmpty()) {
-                return;
-            }
-            Inventory inventory = e.getInventory();
-            Player p = (Player) e.getPlayer();
-            cacheInv.put(p.getUniqueId(),inventory);
-            p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
+            Bukkit.getScheduler().runTask(plugin,()->{
+                long now = System.currentTimeMillis();
+                timeCost = timeCost+(now-lastTime);
+                if (itemStackMap.values().isEmpty()){
+                    player.sendMessage("§3It takes you §a"+(double) timeCost / 1000+"§3s to complete the game");
+                    saveTheFastestRecord();
+                    return;
+                }
+                Player p = (Player) e.getPlayer();
+                cacheInv.put(p.getUniqueId(),inv);
+                p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
+            });
         });
         onClick(e->{
             e.setCancelled(true);
@@ -88,17 +101,15 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
                     return;
                 }
                 if (upItem.getValue() == closetItem) {
+                    upItem = null;
                     inv.setItem(nowSlot, null);
                     inv.setItem(upSlot, null);
                     itemStackMap.remove(nowSlot);
                     itemStackMap.remove(upSlot);
-                    upItem = null;
-                    System.out.println(itemStackMap.size());
-                    if (itemStackMap.isEmpty()){
-                        HumanEntity human = e.getWhoClicked();
-                        human.closeInventory();
+                    if (itemStackMap.values().isEmpty()){
+                        player.closeInventory();
                         serverRunCmd(getConfigStringList("runCmd.successe",player));
-                        human.sendMessage(getConfigString("Msg.completeXioxiaole",player));
+                        player.sendMessage(getConfigString("Msg.completeXioxiaole",player));
                     }
                     return;
                 }
@@ -110,6 +121,14 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
         onDrag(e->{
             e.setCancelled(true);
         });
+    }
+
+    private void saveTheFastestRecord() {
+        FileConfiguration config = playerData.getConfiguration();
+        double old = config.getDouble(player.getName(),99999.0);
+        double newC = Math.min(old, ((double) timeCost / 1000));
+        config.set(player.getName(),newC);
+        playerData.save();
     }
 
     private ItemStack createPokemonItem(EnumSpecies enumSpecies) {
