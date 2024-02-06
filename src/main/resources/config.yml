@@ -1,14 +1,14 @@
 gui:
   title: 'Poke消消乐 ———— %player_name%'
   hideItemM: 'STAINED_GLASS_PANE'
-  pokeItemN: '{poke_name}'
+  pokeItemN: '&3{poke_name}'
   pokeItemL:
     - ''
 runCmd:
   start:
     - 'say %player_name% 开始尝试消消乐'
   successe:
-    - 'minecraft:give %player_name% DIAMOND 1'
+    - 'minecraft:give %player_name% minecraft:diamond 1'
     - 'say %player_name% 恭喜玩家完成消消乐获得 钻石 一个'
   abandon:
     - 'say %player_name% 居然放弃了这么简单的消消乐'

@@ -5,8 +5,8 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.Main.playerData;
-import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.Main.plugin;
+import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.SomeMethod.playerData;
+import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.SomeMethod.plugin;
 
 public class MyPapi extends PlaceholderExpansion {
     @Override
@@ -26,8 +26,10 @@ public class MyPapi extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (params.split("_")[0].equalsIgnoreCase("record")) {
-            return String.valueOf(playerData.getConfiguration().getDouble(player.getName()));
+        String key = params.split("_")[0];
+        if (key.equalsIgnoreCase("record")) {
+            double v = playerData.getConfiguration().getDouble(player.getName(), -999);
+            return v == -999?null:v+"";
         }
         return null;
     }

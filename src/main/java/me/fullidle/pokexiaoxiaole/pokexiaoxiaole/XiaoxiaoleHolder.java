@@ -1,42 +1,26 @@
 package me.fullidle.pokexiaoxiaole.pokexiaoxiaole;
 
-import com.pixelmonmod.pixelmon.Pixelmon;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.enums.EnumSpecies;
-import com.pixelmonmod.pixelmon.items.ItemPixelmonSprite;
 import javafx.util.Pair;
-import me.fullidle.ficore.ficore.common.api.ineventory.ListenerInvHolder;
-import me.fullidle.ficore.ficore.common.api.util.FileUtil;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.UUID;
 
-import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.Main.*;
-import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.XiaoxiaoleHolder.BeginResults.*;
+import static me.fullidle.ficore.ficore.common.SomeMethod.getMinecraftVersion;
+import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.SomeMethod.*;
+import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.XiaoxiaoleHolder.BeginResults.RESUME;
+import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.XiaoxiaoleHolder.BeginResults.START;
 
-public class XiaoxiaoleHolder extends ListenerInvHolder {
-    public static Map<UUID, Inventory> cacheInv = new HashMap<>();
-    private final Inventory inv;
-    private final Map<Integer,ItemStack> itemStackMap = new HashMap<>();
-    private Pair<Integer,ItemStack> upItem;
-    private final ItemStack hideStack;
-    private final Player player;
-    private long lastTime = 0L;
-    private long timeCost;
-
+@Getter
+public class XiaoxiaoleHolder extends AbHolder{
     private XiaoxiaoleHolder(Player player){
-        this.player = player;
+        super(player);
         {
             hideStack = new ItemStack(Material.getMaterial(getConfigString("gui.hideItemM",player)));
             ItemMeta meta = hideStack.getItemMeta();
@@ -54,37 +38,28 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
         }
 
         int pokeNumber = inv.getSize() / 2;
-        List<EnumSpecies> list = Arrays.asList(EnumSpecies.values());
-        List<Integer> collect = IntStream.range(0, inv.getSize()).boxed().collect(Collectors.toList());
-        Collections.shuffle(collect);
-        for (int i = 0; i < pokeNumber; i++) {
-            Collections.shuffle(list);
-            EnumSpecies species = list.get(0);
-            ItemStack item = createPokemonItem(species);
-            itemStackMap.put(collect.get(i),item);
-            itemStackMap.put(collect.get(collect.size()-1-i),item);
+        if (getMinecraftVersion().contains("1.12.2")){
+            V12Method.randomPutItem(this);
+            return;
         }
+        V16Method.randomPutItem(this);
     }
 
     public void initEventHandler(){
-        onOpen(e->{
-            lastTime = System.currentTimeMillis();
-        });
-        onClose(e->{
-            Bukkit.getScheduler().runTask(plugin,()->{
-                long now = System.currentTimeMillis();
-                timeCost = timeCost+(now-lastTime);
-                if (itemStackMap.values().isEmpty()){
-                    stop(player);
-                    player.sendMessage("§3It takes you §a"+(double) timeCost / 1000+"§3s to complete the game");
-                    saveTheFastestRecord();
-                    return;
-                }
-                Player p = (Player) e.getPlayer();
-                cacheInv.put(p.getUniqueId(),inv);
-                p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
-            });
-        });
+        onOpen(e-> lastTime = System.currentTimeMillis());
+        onClose(e-> Bukkit.getScheduler().runTask(plugin,()->{
+            long now = System.currentTimeMillis();
+            timeCost = timeCost+(now-lastTime);
+            if (itemStackMap.values().isEmpty()){
+                stop(player);
+                player.sendMessage("§3It takes you §a"+(double) timeCost / 1000+"§3s to complete the game");
+                saveTheFastestRecord();
+                return;
+            }
+            Player p = (Player) e.getPlayer();
+            cacheInv.put(p.getUniqueId(),inv);
+            p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
+        }));
         onClick(e->{
             e.setCancelled(true);
             ItemStack item = e.getCurrentItem();
@@ -119,9 +94,7 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
             upItem = new Pair<>(nowSlot,closetItem);
             inv.setItem(nowSlot,closetItem);
         });
-        onDrag(e->{
-            e.setCancelled(true);
-        });
+        onDrag(e-> e.setCancelled(true));
     }
 
     private void saveTheFastestRecord() {
@@ -130,18 +103,6 @@ public class XiaoxiaoleHolder extends ListenerInvHolder {
         double newC = Math.min(old, ((double) timeCost / 1000));
         config.set(player.getName(),newC);
         playerData.save();
-    }
-
-    private ItemStack createPokemonItem(EnumSpecies enumSpecies) {
-        Pokemon pokemon = Pixelmon.pokemonFactory.create(enumSpecies);
-        ItemStack item = CraftItemStack.asBukkitCopy((net.minecraft.server.v1_12_R1.ItemStack)
-                ((Object) ItemPixelmonSprite.getPhoto(
-                        pokemon)));
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(getConfigString("gui.pokeItemN",player).replace("{poke_name}",pokemon.getLocalizedName()));
-        meta.setLore(getConfigStringList("gui.pokeItemL",player));
-        item.setItemMeta(meta);
-        return item;
     }
 
     @Override

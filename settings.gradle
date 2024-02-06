@@ -1,2 +1,5 @@
 rootProject.name = 'PokeXiaoxiaole'
+include 'v1_12_2'
+include 'v1_16_5'
+include 'common'
 
