@@ -81,6 +81,10 @@ public class XiaoxiaoleHolder extends AbHolder{
                     inv.setItem(upSlot, null);
                     itemStackMap.remove(nowSlot);
                     itemStackMap.remove(upSlot);
+
+                    //执行一段命令
+                    serverRunCmd(getConfigStringList("runCmd.clearUp",player));
+
                     if (itemStackMap.values().isEmpty()){
                         player.closeInventory();
                         serverRunCmd(getConfigStringList("runCmd.successe",player));

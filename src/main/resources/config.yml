@@ -18,6 +18,8 @@ nameList:
     - 'Ditto'
 ##触发点执行
 runCmd:
+  clearUp:
+    - 'msg %player_name% 消除了一对宝可梦(分手大湿)'
   start:
     - 'say %player_name% 开始尝试消消乐'
   successe:
