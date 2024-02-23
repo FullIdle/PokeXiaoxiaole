@@ -9,9 +9,7 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,15 +29,20 @@ public class V12Method {
         return item;
     }
 
-    public static void randomPutItem(AbHolder holder){
+    public static void randomPutItem(AbHolder holder,List<String> nameList){
         int pokeNumber = holder.getInventory().getSize() / 2;
         List<EnumSpecies> list = Arrays.asList(EnumSpecies.values());
+        if (nameList != null){
+            list = nameList.stream().map(EnumSpecies::getFromNameAnyCase).collect(Collectors.toList());
+        }
         List<Integer> collect = IntStream.range(0, holder.getInventory().getSize()).boxed().collect(Collectors.toList());
         Collections.shuffle(collect);
+
+        Map<EnumSpecies,ItemStack> cache = new HashMap<>();
         for (int i = 0; i < pokeNumber; i++) {
             Collections.shuffle(list);
             EnumSpecies species = list.get(0);
-            ItemStack item = createPokemonItem(species,holder.player);
+            ItemStack item = cache.computeIfAbsent(species,k->createPokemonItem(species,holder.player));
             holder.itemStackMap.put(collect.get(i),item);
             holder.itemStackMap.put(collect.get(collect.size()-1-i),item);
         }

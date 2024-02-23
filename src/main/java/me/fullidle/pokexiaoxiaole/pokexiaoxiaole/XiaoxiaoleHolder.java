@@ -1,6 +1,5 @@
 package me.fullidle.pokexiaoxiaole.pokexiaoxiaole;
 
-import javafx.util.Pair;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
 import java.util.UUID;
 
 import static me.fullidle.ficore.ficore.common.SomeMethod.getMinecraftVersion;
@@ -19,8 +19,8 @@ import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.XiaoxiaoleHolder.BeginRe
 
 @Getter
 public class XiaoxiaoleHolder extends AbHolder{
-    private XiaoxiaoleHolder(Player player){
-        super(player);
+    private XiaoxiaoleHolder(Player player, List<String> nameList){
+        super(player,nameList);
         {
             hideStack = new ItemStack(Material.getMaterial(getConfigString("gui.hideItemM",player)));
             ItemMeta meta = hideStack.getItemMeta();
@@ -37,12 +37,11 @@ public class XiaoxiaoleHolder extends AbHolder{
             inv.setItem(i,hideStack);
         }
 
-        int pokeNumber = inv.getSize() / 2;
         if (getMinecraftVersion().contains("1.12.2")){
-            V12Method.randomPutItem(this);
+            V12Method.randomPutItem(this,nameList);
             return;
         }
-        V16Method.randomPutItem(this);
+        V16Method.randomPutItem(this,nameList);
     }
 
     public void initEventHandler(){
@@ -110,10 +109,10 @@ public class XiaoxiaoleHolder extends AbHolder{
         return inv;
     }
 
-    public static BeginResults begin(Player player){
+    public static BeginResults begin(Player player,List<String> nameList){
         UUID uuid = player.getUniqueId();
         boolean b = cacheInv.containsKey(uuid);
-        Inventory inventory = b ?cacheInv.get(uuid):new XiaoxiaoleHolder(player).getInventory();
+        Inventory inventory = b ?cacheInv.get(uuid):new XiaoxiaoleHolder(player,nameList).getInventory();
         player.openInventory(inventory);
         return b?RESUME:START;
     }

@@ -49,7 +49,7 @@ public class Main extends JavaPlugin {
                     sender.sendMessage(getConfigString("Msg.reload",null));
                     return false;
                 }
-                if (playerHandlerRequired(sender,cmd)){
+                if (playerHandlerRequired(sender,args)){
                     return false;
                 }
             }
@@ -58,13 +58,13 @@ public class Main extends JavaPlugin {
         return false;
     }
 
-    public boolean playerHandlerRequired(CommandSender sender,String cmd){
+    public boolean playerHandlerRequired(CommandSender sender,String[] args){
         if (!(sender instanceof Player)){
             sender.sendMessage("§cYou are not a player!");
             return true;
         }
         Player player = (Player) sender;
-        switch (cmd){
+        switch (args[0]){
             case "stop":{
                 boolean b = XiaoxiaoleHolder.stop(player);
                 String msg = b?getConfigString("Msg.stopGame",player):"§cOn null Object";
@@ -75,7 +75,8 @@ public class Main extends JavaPlugin {
                 return true;
             }
             case "begin":{
-                XiaoxiaoleHolder.BeginResults begin = XiaoxiaoleHolder.begin(player);
+                List<String> nameList = args.length > 1?getConfig().getStringList("nameList."+args[1]):null;
+                XiaoxiaoleHolder.BeginResults begin = XiaoxiaoleHolder.begin(player,nameList);
                 boolean b = begin == XiaoxiaoleHolder.BeginResults.START;
                 String msg = b ?getConfigString("Msg.startGame",player):getConfigString("Msg.resumeGame",player);
                 sender.sendMessage(msg);
@@ -92,6 +93,9 @@ public class Main extends JavaPlugin {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length < 1) return subCmd;
         if (args.length == 1) return subCmd.stream().filter(s->s.startsWith(args[0])).collect(Collectors.toList());
+        if (args[0].equalsIgnoreCase("begin")) {
+            return getConfig().getConfigurationSection("nameList").getKeys(false).stream().filter(s->s.startsWith(args[1])).collect(Collectors.toList());
+        }
         return null;
     }
 }
