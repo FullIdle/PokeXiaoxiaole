@@ -17,16 +17,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.SomeMethod.getConfigString;
-import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.SomeMethod.getConfigStringList;
+import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.SomeMethod.*;
 
 public class V16Method {
     public static ItemStack createPokemonItem(Species enumSpecies, OfflinePlayer player) {
         Pokemon pokemon = PokemonFactory.create(enumSpecies);
         ItemStack item = CraftItemStack.asBukkitCopy(SpriteItemHelper.getPhoto(pokemon));
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(getConfigString("gui.pokeItemN",player).replace("{poke_name}",pokemon.getLocalizedName()));
-        meta.setLore(getConfigStringList("gui.pokeItemL",player));
+        meta.setDisplayName(getConfigString(plugin.getConfig(),"gui.pokeItemN",player).replace("{poke_name}",pokemon.getLocalizedName()));
+        meta.setLore(getConfigStringList(plugin.getConfig(),"gui.pokeItemL",player));
         item.setItemMeta(meta);
         return item;
     }

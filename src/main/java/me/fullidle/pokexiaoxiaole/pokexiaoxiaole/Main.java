@@ -28,7 +28,7 @@ public class Main extends JavaPlugin {
     public void reloadConfig() {
         saveDefaultConfig();
         super.reloadConfig();
-        help = getConfigStringList("Msg.help",null).toArray(new String[0]);
+        help = getConfigStringList(plugin.getConfig(),"Msg.help",null).toArray(new String[0]);
 
         playerData = FileUtil.getInstance(new File(getDataFolder(), "playerData.yml"), true);
     }
@@ -46,7 +46,7 @@ public class Main extends JavaPlugin {
             if (subCmd.contains(cmd)){
                 if (cmd.equalsIgnoreCase("reload")){
                     reloadConfig();
-                    sender.sendMessage(getConfigString("Msg.reload",null));
+                    sender.sendMessage(getConfigString(plugin.getConfig(),"Msg.reload",null));
                     return false;
                 }
                 if (playerHandlerRequired(sender,args)){
@@ -67,22 +67,20 @@ public class Main extends JavaPlugin {
         switch (args[0]){
             case "stop":{
                 boolean b = XiaoxiaoleHolder.stop(player);
-                String msg = b?getConfigString("Msg.stopGame",player):"§cOn null Object";
+                String msg = b?getConfigString(plugin.getConfig(),"Msg.stopGame",player):"§cOn null Object";
                 sender.sendMessage(msg);
-                if (b){
-                    serverRunCmd(getConfigStringList("runCmd.abandon",player));
-                }
                 return true;
             }
             case "begin":{
-                List<String> nameList = args.length > 1?getConfig().getStringList("nameList."+args[1]):null;
-                XiaoxiaoleHolder.BeginResults begin = XiaoxiaoleHolder.begin(player,nameList);
-                boolean b = begin == XiaoxiaoleHolder.BeginResults.START;
-                String msg = b ?getConfigString("Msg.startGame",player):getConfigString("Msg.resumeGame",player);
-                sender.sendMessage(msg);
-                if (b){
-                    serverRunCmd(getConfigStringList("runCmd.start",player));
+                List<String> nameList = args.length > 1? getConfig().getStringList("nameList."+args[1]):null;
+                if (nameList != null && nameList.isEmpty()){
+                    sender.sendMessage("§cUnknown list");
+                    return true;
                 }
+                XiaoxiaoleHolder.BeginResults begin = XiaoxiaoleHolder.begin(player,nameList,nameList == null?null:args[1]);
+                boolean b = begin == XiaoxiaoleHolder.BeginResults.START;
+                String msg = b ?getConfigString(plugin.getConfig(),"Msg.startGame",player):getConfigString(plugin.getConfig(),"Msg.resumeGame",player);
+                sender.sendMessage(msg);
                 return true;
             }
         }

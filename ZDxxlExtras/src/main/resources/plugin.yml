@@ -1,0 +1,5 @@
+name: ZDxxlExtras
+main: me.fullidle.fipokestore.zdxxlextras.Main
+version: 1.0
+depend:
+    - PokeXiaoxiaole

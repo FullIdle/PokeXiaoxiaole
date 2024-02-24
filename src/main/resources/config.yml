@@ -5,8 +5,6 @@ gui:
   pokeItemN: '&3{poke_name}'
   pokeItemL:
     - ''
-##限时 单位秒 (够高就是不限制)(没问成就是强制结束,等同直接使用stop指令放弃)
-timeLimit: 999
 ##自定义列表,可以配置多个列表名随意(游戏中有自动补全玩家自己可以看到,你也可以配置成别的方式比如菜单)
 ##/pxxl begin (列表名)不写列表名则游戏内已加入的所有精灵
 nameList:
@@ -16,17 +14,6 @@ nameList:
   list2:
     - 'Charmander'
     - 'Ditto'
-##触发点执行
-runCmd:
-  clearUp:
-    - 'msg %player_name% 消除了一对宝可梦(分手大湿)'
-  start:
-    - 'say %player_name% 开始尝试消消乐'
-  successe:
-    - 'minecraft:give %player_name% minecraft:diamond 1'
-    - 'say %player_name% 恭喜玩家完成消消乐获得 钻石 一个'
-  abandon:
-    - 'say %player_name% 居然放弃了这么简单的消消乐'
 ##一些自定义信息
 Msg:
   reload: '&a插件已重载!'

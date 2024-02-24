@@ -1,6 +1,7 @@
 package me.fullidle.pokexiaoxiaole.pokexiaoxiaole;
 
 import lombok.Getter;
+import me.fullidle.pokexiaoxiaole.pokexiaoxiaole.events.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,15 +20,15 @@ import static me.fullidle.pokexiaoxiaole.pokexiaoxiaole.XiaoxiaoleHolder.BeginRe
 
 @Getter
 public class XiaoxiaoleHolder extends AbHolder{
-    private XiaoxiaoleHolder(Player player, List<String> nameList){
-        super(player,nameList);
+    private XiaoxiaoleHolder(Player player, List<String> nameList,String listKey){
+        super(player,nameList,listKey);
         {
-            hideStack = new ItemStack(Material.getMaterial(getConfigString("gui.hideItemM",player)));
+            hideStack = new ItemStack(Material.getMaterial(getConfigString(plugin.getConfig(),"gui.hideItemM",player)));
             ItemMeta meta = hideStack.getItemMeta();
             meta.setDisplayName(" ");
             hideStack.setItemMeta(meta);
         }
-        inv = Bukkit.createInventory(this,6*9,getConfigString("gui.title",player));
+        inv = Bukkit.createInventory(this,6*9,getConfigString(plugin.getConfig(),"gui.title",player));
         initItem();
         initEventHandler();
     }
@@ -47,6 +48,8 @@ public class XiaoxiaoleHolder extends AbHolder{
     public void initEventHandler(){
         onOpen(e-> lastTime = System.currentTimeMillis());
         onClose(e-> Bukkit.getScheduler().runTask(plugin,()->{
+            Bukkit.getPluginManager().callEvent(new PauseEvent(player,this));
+
             long now = System.currentTimeMillis();
             timeCost = timeCost+(now-lastTime);
             if (itemStackMap.values().isEmpty()){
@@ -57,7 +60,7 @@ public class XiaoxiaoleHolder extends AbHolder{
             }
             Player p = (Player) e.getPlayer();
             cacheInv.put(p.getUniqueId(),inv);
-            p.sendMessage(getConfigString("Msg.leaveTemporarily",p));
+            p.sendMessage(getConfigString(plugin.getConfig(),"Msg.leaveTemporarily",p));
         }));
         onClick(e->{
             e.setCancelled(true);
@@ -76,19 +79,25 @@ public class XiaoxiaoleHolder extends AbHolder{
                     return;
                 }
                 if (upItem.getValue() == closetItem) {
+                    //触发消除事件
+                    ClearUpEvent event = new ClearUpEvent(player,upItem.getValue(),closetItem,this);
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (event.isCancelled()) {
+                        return;
+                    }
+
                     upItem = null;
                     inv.setItem(nowSlot, null);
                     inv.setItem(upSlot, null);
                     itemStackMap.remove(nowSlot);
                     itemStackMap.remove(upSlot);
 
-                    //执行一段命令
-                    serverRunCmd(getConfigStringList("runCmd.clearUp",player));
-
                     if (itemStackMap.values().isEmpty()){
                         player.closeInventory();
-                        serverRunCmd(getConfigStringList("runCmd.successe",player));
-                        player.sendMessage(getConfigString("Msg.completeXioxiaole",player));
+
+                        Bukkit.getPluginManager().callEvent(new SuccessEvent(player,this));
+
+                        player.sendMessage(getConfigString(plugin.getConfig(),"Msg.completeXioxiaole",player));
                     }
                     return;
                 }
@@ -113,16 +122,22 @@ public class XiaoxiaoleHolder extends AbHolder{
         return inv;
     }
 
-    public static BeginResults begin(Player player,List<String> nameList){
+    public static BeginResults begin(Player player,List<String> nameList,String listKey){
         UUID uuid = player.getUniqueId();
         boolean b = cacheInv.containsKey(uuid);
-        Inventory inventory = b ?cacheInv.get(uuid):new XiaoxiaoleHolder(player,nameList).getInventory();
+        XiaoxiaoleHolder holder = new XiaoxiaoleHolder(player, nameList,listKey);
+        Inventory inventory = b ?cacheInv.get(uuid): holder.getInventory();
         player.openInventory(inventory);
+        if (!b){
+            Bukkit.getPluginManager().callEvent(new StartEvent(player,holder));
+        }
         return b?RESUME:START;
     }
     public static boolean stop(Player player){
         UUID uuid = player.getUniqueId();
         if (cacheInv.containsKey(uuid)){
+            XiaoxiaoleHolder holder = (XiaoxiaoleHolder) cacheInv.get(uuid).getHolder();
+            Bukkit.getPluginManager().callEvent(new AbandonEvent(player,holder));
             cacheInv.remove(uuid);
             return true;
         }

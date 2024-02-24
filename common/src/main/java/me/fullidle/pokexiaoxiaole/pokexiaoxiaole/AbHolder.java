@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public abstract class AbHolder extends ListenerInvHolder {
     public final Player player;
+    public final String listKey;
     public final List<String> nameList;
     public final Map<Integer, ItemStack> itemStackMap = new HashMap<>();
     public static Map<UUID, Inventory> cacheInv = new HashMap<>();
@@ -20,8 +21,9 @@ public abstract class AbHolder extends ListenerInvHolder {
     public ItemStack hideStack;
     public long lastTime = 0L;
     public long timeCost;
-    protected AbHolder(Player player, List<String> nameList) {
+    protected AbHolder(Player player, List<String> nameList, String listKey) {
         this.player = player;
+        this.listKey = listKey;
         this.nameList = nameList;
     }
 }
