@@ -1,30 +1,6 @@
-##gui的基本配置
 gui:
-  title: 'Poke消消乐 ———— %player_name%'
-  hideItemM: 'STAINED_GLASS_PANE'
-  pokeItemN: '&3{poke_name}'
+  title: '宝可梦消消乐'
+  hideItemM: STONE
+  pokeItemN: '{pokemon_name}'
   pokeItemL:
     - ''
-##自定义列表,可以配置多个列表名随意(游戏中有自动补全玩家自己可以看到,你也可以配置成别的方式比如菜单)
-##/pxxl begin (列表名)不写列表名则游戏内已加入的所有精灵
-nameList:
-  list1:
-    - 'Abomasnow'
-    - 'Charmander'
-  list2:
-    - 'Charmander'
-    - 'Ditto'
-##一些自定义信息
-Msg:
-  reload: '&a插件已重载!'
-  completeXioxiaole: '&a成功消除所有宝可梦!'
-  leaveTemporarily: '&a消消乐游戏已暂停&7(使用/pxxl begin[可恢复])'
-  stopGame: '&a成功停止游戏!'
-  resumeGame: '&a继续游戏'
-  startGame: '&a开始游戏'
-  help:
-    - 'CMD:pxxl'
-    - 'args:↓'
-    - '  stop 放弃(放弃后则没办法继续,只能重开一局{begin})'
-    - '  begin (列表名{可选}) 开始一局游戏(如果上局没有结束则继续上一局)'
-    - '  reload 重载config.yml'
