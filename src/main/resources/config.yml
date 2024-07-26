@@ -2,5 +2,20 @@ gui:
   title: '宝可梦消消乐'
   hideItemM: STONE
   pokeItemN: '{pokemon_name}'
-  pokeItemL:
-    - ''
+
+xxl-list:
+  自定义1:
+    - 'Ditto'
+    - '小火龙'
+    - '玛夏多'
+    - '喷火龙'
+    - '妙蛙花'
+  自定义2:
+    - 'MissingNo'
+    - '小火龙'
+    - '火恐龙'
+    - '喷火龙'
+    - '喷火龙'
+    - '妙蛙花'
+    - '妙蛙种子'
+    - '妙蛙草'
