@@ -58,6 +58,7 @@ public class Gui extends ListenerInvHolder {
         this.onOpen(e->{
             this.startTime = LocalDateTime.now();
             Bukkit.getPluginManager().callEvent(new PxxlStartEvent(this));
+            this.player.sendMessage(PapiHelper.papi(this.player,Data.plugin.getConfig().getString("xxl-list.msg.play")));
         });
 
         this.onClick((e) -> {
@@ -95,11 +96,28 @@ public class Gui extends ListenerInvHolder {
                 //完成
                 LocalDateTime now = LocalDateTime.now();
                 seconds = Duration.between(this.startTime, now).getSeconds();
-                this.player.sendMessage(seconds+"");
+
+                //记录
+                PlayerData data = PlayerData.getPlayerData(player);
+                if (this.xxlListName == null){
+                    long old = data.getDefaultRecord();
+                    if (old > seconds || old == -999){
+                        data.setDefaultRecord(seconds);
+                    }
+                }else{
+                    long old = data.getXxlListRecord(this.xxlListName);
+                    if (old > seconds || old == -999){
+                        data.setXxListRecord(this.xxlListName,seconds);
+                    }
+                }
+
+                this.player.sendMessage(PapiHelper.papi(this.player,
+                        Data.plugin.getConfig().getString("xxl-list.msg.end")
+                                .replace("{use_time}",String.valueOf(seconds))));
             }else{
                 //放弃
-                this.player.sendMessage("abandon");
                 seconds = 0;
+                this.player.sendMessage(PapiHelper.papi(this.player,Data.plugin.getConfig().getString("xxl-list.msg.abandon")));
             }
             Bukkit.getPluginManager().callEvent(new PxxlEndEvent(this,seconds));
         });

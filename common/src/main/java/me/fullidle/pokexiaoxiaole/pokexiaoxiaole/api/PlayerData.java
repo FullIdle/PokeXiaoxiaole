@@ -18,28 +18,28 @@ import java.util.Map;
 public class PlayerData implements Listener {
     private final FileConfiguration config;
     private final File file;
-    private final Map<String,Integer> xxlListRecord = new HashMap<>();
+    private final Map<String,Long> xxlListRecord = new HashMap<>();
     @Getter
-    private int defaultRecord;
+    private long defaultRecord;
 
     public PlayerData(File file,FileConfiguration config){
         this.file = file;
         this.config = config;
-        this.defaultRecord = config.getInt("defaultRecord");
+        this.defaultRecord = config.getInt("defaultRecord",-999);
         ConfigurationSection section = config.getConfigurationSection("xxlListRecord");
         if (section == null) return;
         for (String key : section.getKeys(false)) {
-            this.xxlListRecord.put(key,section.getInt(key));
+            this.xxlListRecord.put(key,section.getLong(key));
         }
     }
 
-    public int getXxlListRecord(String listName){
-        return xxlListRecord.get(listName);
+    public long getXxlListRecord(String listName){
+        return this.xxlListRecord.getOrDefault(listName,-999L);
     }
 
     @SneakyThrows
-    public int setDefaultRecord(int value){
-        int old = getDefaultRecord();
+    public long setDefaultRecord(long value){
+        long old = getDefaultRecord();
         this.config.set("defaultRecord",value);
         this.config.save(this.file);
         this.defaultRecord = value;
@@ -47,14 +47,13 @@ public class PlayerData implements Listener {
     }
 
     @SneakyThrows
-    public int setXxListRecord(String listName, int value){
-        int old = getXxlListRecord(listName);
+    public long setXxListRecord(String listName, long value){
+        long old = getXxlListRecord(listName);
         this.config.set("xxlListRecord."+listName,value);
         this.config.save(this.file);
         this.xxlListRecord.put(listName,value);
         return old;
     }
-
 
 
 
@@ -69,11 +68,13 @@ public class PlayerData implements Listener {
         }
     }
 
+    @SneakyThrows
     public static PlayerData getPlayerData(OfflinePlayer player){
         if (cache.containsKey(player)) return cache.get(player);
         File file = new File(playerFolder, player.getUniqueId().toString() + ".yml");
         FileConfiguration configuration;
         if (!file.exists()) {
+            file.createNewFile();
             configuration = YamlConfiguration.loadConfiguration(new StringReader(" "));
         }else{
             configuration = YamlConfiguration.loadConfiguration(file);

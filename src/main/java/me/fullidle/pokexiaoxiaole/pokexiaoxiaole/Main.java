@@ -5,6 +5,8 @@ import me.fullidle.pokexiaoxiaole.pokexiaoxiaole.api.Data;
 import me.fullidle.pokexiaoxiaole.pokexiaoxiaole.api.PlayerData;
 import me.fullidle.pokexiaoxiaole.pokexiaoxiaole.cmds.MainCmd;
 import me.fullidle.pokexiaoxiaole.pokexiaoxiaole.verapi.V12Api;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
